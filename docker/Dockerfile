@@ -1,9 +1,9 @@
 FROM fathyb/carbonyl:latest
 ARG START_PAGE="https://start.duckduckgo.com/"
 USER root
-RUN apt update && apt install -y openssh-server mosh locales libevent-core-2.1-7 && rm -rf /var/lib/apt/lists/*
+RUN apt update && apt install -y openssh-server mosh locales libevent-core-2.1-7 tmux && rm -rf /var/lib/apt/lists/*
 RUN mkdir -p /carbonyl/data/.ssh && usermod -d /carbonyl/data carbonyl
-COPY tmux /usr/bin/
+#COPY tmux /usr/bin/
 COPY .tmux.conf /carbonyl/data/
 COPY --chown=carbonyl:carbonyl --chmod=600 carbonyl_rsa.pub /carbonyl/data/.ssh/authorized_keys
 RUN echo "printf '\\033]2;Carbonyl\\033\\\\'; [ -n \"\$TMUX\" ] && /carbonyl/carbonyl --no-sandbox --disable-dev-shm-usage --user-data-dir=/carbonyl/data --incognito \${START_PAGE:-$START_PAGE} || tmux; exit" > /carbonyl/data/.profile
