@@ -6,5 +6,8 @@ RSA_KEY="-----BEGIN OPENSSH PRIVATE KEY-----\nb3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAA
 KEY_CMD="[ -f "$(dirname $0)/carbonyl_rsa" ] || { echo \"$RSA_KEY\" > "$(dirname $0)/carbonyl_rsa" && chmod 600 "$(dirname $0)/carbonyl_rsa"; }"
 SSH_CMD="ssh -C -i "$(dirname $0)/carbonyl_rsa" -p 2222 -o StrictHostKeyChecking=no -o SendEnv=START_PAGE"
 MOSH_CMD="MOSH_TITLE_NOPREFIX=1 mosh -p 60000:60100 --ssh=\"$SSH_CMD\" $USER_HOST"
+DOCKER_CARBONYL_RUNNING="$(docker container list | grep carbonyl)"
+[ -z "$DOCKER_CARBONYL_RUNNING" ] && (cd "$(dirname $0)/docker"; docker compose up -d)
 echo Connecting to Carbonyl...
 sh -c "$KEY_CMD && $MOSH_CMD || $SSH_CMD $USER_HOST"
+[ -z "$DOCKER_CARBONYL_RUNNING" ] && (cd "$(dirname $0)/docker"; docker compose down)
